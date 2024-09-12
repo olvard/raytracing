@@ -10,4 +10,6 @@ add_executable(raytracer main.cpp
         polygon.h
         colorDBL.h
         polygon.cpp
-        scene.cpp)
+        scene.cpp
+        ray.cpp
+        ray.h)

@@ -16,37 +16,13 @@ int main() {
     Camera camera(eye, c1, c2, c3, c4, 800, 600);  // Initialize the camera
     Scene scene;
 
-    // Create some polygons
-    std::vector<glm::vec3> triangleVertices_left = {
-        {0.0f, 6.0f, 0.0f},
-        {0.0f, -6.0f, 0.0f},
-        {-3.0f, 0.0f, 0.0f}
-    };
-    Polygon triangle_l(3, triangleVertices_left, colorDBL(1.0f, 0.0f, 0.0f));  // Red triangle
+    scene.addRoom();
+    scene.addCamera(camera);
 
 
-    std::vector<glm::vec3> triangleVertices_right= {
-        {10.0f, 6.0f, 0.0f},
-        {13.0f, 0.0f, 0.0f},
-        {10.0f, -6.0f, 0.0f}
-    };
-    Polygon triangle_r(3, triangleVertices_right, colorDBL(1.0f, 0.0f, 0.0f));  // Red triangle
-
-    std::vector<glm::vec3> squareVertices = {
-        {0.0f, 6.0f, 0.0f},
-        {10.0f, 6.0f, 0.0f},
-        {0.0f, -6.0f, 0.0f},
-        {10.0f, -6.0f, 0.0f}
-    };
-    Polygon square(4, squareVertices, colorDBL(0.0f, 1.0f, 0.0f));  // Green square
-
-    // Add polygons to the scene
-    scene.addPolygon(triangle_l);
-    scene.addPolygon(triangle_r);
-    scene.addPolygon(square);
 
     // Render the scene to a PPM file
-    camera.render("/Users/oliverlundin/Local Documents/github/raytracer/output.ppm", scene);
+    camera.render("/Users/oliverlundin/Local Documents/github/raytracer/output.ppm", colorMatrix);
 
     std::cout << "Rendering complete!" << std::endl;
 

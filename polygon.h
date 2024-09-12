@@ -11,10 +11,6 @@
 #include "colorDBL.h"
 
 class Polygon {
-protected:
-
-    std::vector<glm::vec3> vertices;
-    colorDBL color;
 
 public:
     int numSides;
@@ -24,6 +20,12 @@ public:
     const std::vector<glm::vec3>& getVertices() const { return vertices; }
 
     const colorDBL& getColor() const { return color; }
+
+    glm::vec3 getNormal() const;
+
+private:
+    std::vector<glm::vec3> vertices;
+    colorDBL color;
 
 
 };

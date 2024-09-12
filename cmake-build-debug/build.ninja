@@ -73,6 +73,12 @@ build CMakeFiles/raytracer.dir/scene.cpp.o: CXX_COMPILER__raytracer_unscanned_De
   OBJECT_DIR = CMakeFiles/raytracer.dir
   OBJECT_FILE_DIR = CMakeFiles/raytracer.dir
 
+build CMakeFiles/raytracer.dir/ray.cpp.o: CXX_COMPILER__raytracer_unscanned_Debug /Users/oliverlundin/Local$ Documents/github/raytracer/ray.cpp || cmake_object_order_depends_target_raytracer
+  DEP_FILE = CMakeFiles/raytracer.dir/ray.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/raytracer.dir
+  OBJECT_FILE_DIR = CMakeFiles/raytracer.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target raytracer
@@ -81,7 +87,7 @@ build CMakeFiles/raytracer.dir/scene.cpp.o: CXX_COMPILER__raytracer_unscanned_De
 #############################################
 # Link the executable raytracer
 
-build raytracer: CXX_EXECUTABLE_LINKER__raytracer_Debug CMakeFiles/raytracer.dir/main.cpp.o CMakeFiles/raytracer.dir/camera.cpp.o CMakeFiles/raytracer.dir/polygon.cpp.o CMakeFiles/raytracer.dir/scene.cpp.o
+build raytracer: CXX_EXECUTABLE_LINKER__raytracer_Debug CMakeFiles/raytracer.dir/main.cpp.o CMakeFiles/raytracer.dir/camera.cpp.o CMakeFiles/raytracer.dir/polygon.cpp.o CMakeFiles/raytracer.dir/scene.cpp.o CMakeFiles/raytracer.dir/ray.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk
   OBJECT_DIR = CMakeFiles/raytracer.dir
   POST_BUILD = :

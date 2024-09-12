@@ -8,6 +8,8 @@
 #include <iostream>
 #include "polygon.h"
 #include <glm/glm.hpp>
+#include <vector>
+#include "colorDBL.h"
 #include "scene.h"
 
 
@@ -23,9 +25,9 @@ public:
     Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
            const glm::vec3& c3, const glm::vec3& c4, int width, int height) : eye(eye), c1(c1), c2(c2), c3(c3), c4(c4), width(width), height(height) {}
 
-    void render(const std::string& filename, const Scene& scene) const;
+    void render(const std::string& filename, const std::vector<std::vector<colorDBL>>& colorMatrix) const;
 
-    static bool isInsidePolygon(int x, int y, const Polygon& polygon);
+    //static bool isInsidePolygon(int x, int y, const Polygon& polygon);
 
 };
 
