@@ -5,3 +5,12 @@
 4	420	1725975635018067623	CMakeFiles/raytracer.dir/scene.cpp.o	5b1b84bc7aa7e6b8
 4	282	1725975635017539416	CMakeFiles/raytracer.dir/polygon.cpp.o	ae45b768db41858a
 4	471	1725975635017317833	CMakeFiles/raytracer.dir/camera.cpp.o	53e0d836194be984
+12	336	1726492223631831791	CMakeFiles/raytracer.dir/ray.cpp.o	69ac8a65f082d576
+3	310	1726493548590730384	CMakeFiles/raytracer.dir/polygon.cpp.o	ae45b768db41858a
+3	287	1726493578921502031	CMakeFiles/raytracer.dir/scene.cpp.o	5b1b84bc7aa7e6b8
+4	520	1726493846586482666	CMakeFiles/raytracer.dir/main.cpp.o	79de18352147b9c7
+4	322	1726494216204120897	CMakeFiles/raytracer.dir/polygon.cpp.o	ae45b768db41858a
+5	322	1726494216204241143	CMakeFiles/raytracer.dir/scene.cpp.o	5b1b84bc7aa7e6b8
+4	412	1726494216203604584	CMakeFiles/raytracer.dir/main.cpp.o	79de18352147b9c7
+4	510	1726494216203966070	CMakeFiles/raytracer.dir/camera.cpp.o	53e0d836194be984
+510	654	1726494216709754212	raytracer	a6a2cfc6dfaad65c

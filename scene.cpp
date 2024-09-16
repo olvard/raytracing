@@ -11,15 +11,15 @@ void Scene::addRoom() {
         {0.0f, -6.0f, 0.0f},
         {-3.0f, 0.0f, 0.0f}
     };
-    Polygon triangle_l(3, triangleVertices_left, colorDBL(1.0f, 0.0f, 0.0f));  // Red triangle
+    // Using std::make_unique to create a unique_ptr<Triangle>
+    polygons.push_back(std::make_unique<Triangle>(triangleVertices_left, colorDBL(1.0, 0.0, 0.0)));  // Red triangle
 
-
-    std::vector<glm::vec3> triangleVertices_right= {
+    std::vector<glm::vec3> triangleVertices_right = {
         {10.0f, 6.0f, 0.0f},
         {13.0f, 0.0f, 0.0f},
         {10.0f, -6.0f, 0.0f}
     };
-    Polygon triangle_r(3, triangleVertices_right, colorDBL(1.0f, 0.0f, 0.0f));  // Red triangle
+    polygons.push_back(std::make_unique<Triangle>(triangleVertices_right, colorDBL(1.0, 0.0, 0.0)));  // Red triangle
 
     std::vector<glm::vec3> squareVertices = {
         {0.0f, 6.0f, 0.0f},
@@ -27,75 +27,55 @@ void Scene::addRoom() {
         {0.0f, -6.0f, 0.0f},
         {10.0f, -6.0f, 0.0f}
     };
-    Polygon square(4, squareVertices, colorDBL(0.0f, 1.0f, 0.0f));  // Green square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices, colorDBL(0.0, 1.0, 0.0)));  // Green square
 
-    //Walls
-
-    //front left wall
+    // Walls
     std::vector<glm::vec3> squareVertices_fl = {
         {10.0f, 6.0f, -5.0f},
         {10.0f, 6.0f, 5.0f},
         {13.0f, 0.0f, 5.0f},
         {13.0f, 0.0f, -5.0f}
     };
-    Polygon square_fl(4, squareVertices_fl, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_fl, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 
-    //front right wall
     std::vector<glm::vec3> squareVertices_fr = {
         {13.0f, 0.0f, -5.0f},
         {13.0f, 0.0f, 5.0f},
         {10.0f, -6.0f, 5.0f},
         {10.0f, -6.0f, -5.0f}
     };
-    Polygon square_fr(4, squareVertices_fr, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_fr, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 
-    //left wall
     std::vector<glm::vec3> squareVertices_l = {
         {0.0f, 6.0f, -5.0f},
         {0.0f, 6.0f, 5.0f},
         {10.0f, 6.0f, 5.0f},
         {10.0f, 6.0f, -5.0f}
     };
-    Polygon square_l(4, squareVertices_l, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_l, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 
-    //right wall
     std::vector<glm::vec3> squareVertices_r = {
         {0.0f, -6.0f, -5.0f},
         {0.0f, -6.0f, 5.0f},
         {10.0f, -6.0f, 5.0f},
         {10.0f, -6.0f, -5.0f}
     };
-    Polygon square_r(4, squareVertices_r, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_r, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 
-    //back left wall
     std::vector<glm::vec3> squareVertices_bl = {
         {0.0f, 6.0f, -5.0f},
         {0.0f, 6.0f, 5.0f},
         {-3.0f, 0.0f, 5.0f},
         {-3.0f, 0.0f, -5.0f}
     };
-    Polygon square_bl(4, squareVertices_bl, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_bl, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 
-    //back right wall
     std::vector<glm::vec3> squareVertices_br = {
         {-3.0f, 0.0f, -5.0f},
         {-3.0f, 0.0f, 5.0f},
         {0.0f, -6.0f, 5.0f},
         {0.0f, -6.0f, -5.0f}
     };
-    Polygon square_br(4, squareVertices_br, colorDBL(0.0f, 0.0f, 1.0f));  // Blue square
-
-    //add floor
-    this->addPolygon(triangle_l);
-    this->addPolygon(triangle_r);
-    this->addPolygon(square);
-
-    //add walls
-    this->addPolygon(square_fl);
-    this->addPolygon(square_fr);
-    this->addPolygon(square_l);
-    this->addPolygon(square_r);
-    this->addPolygon(square_bl);
-    this->addPolygon(square_br);
-
+    polygons.push_back(std::make_unique<Rectangle>(squareVertices_br, colorDBL(0.0, 0.0, 1.0)));  // Blue square
 }
+

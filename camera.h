@@ -14,20 +14,21 @@
 
 
 class Camera {
+public:
+
+    Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
+           const glm::vec3& c3, const glm::vec3& c4, int width, int height);
+
+    void render(const std::string& filename, const Scene& scene);
+
 private:
-    int width;
-    int height;
+    int width, height;
     glm::vec3 eye;
     glm::vec3 c1,c2,c3,c4;
+    std::vector<std::vector<colorDBL>> pixels;
 
-
-public:
-    Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
-           const glm::vec3& c3, const glm::vec3& c4, int width, int height) : eye(eye), c1(c1), c2(c2), c3(c3), c4(c4), width(width), height(height) {}
-
-    void render(const std::string& filename, const std::vector<std::vector<colorDBL>>& colorMatrix) const;
-
-    //static bool isInsidePolygon(int x, int y, const Polygon& polygon);
+    Ray createRay(int x, int y) const;
+    colorDBL traceRay(const Ray& ray, const Scene& scene) const;
 
 };
 
