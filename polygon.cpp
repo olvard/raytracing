@@ -3,6 +3,12 @@
 //
 #include "polygon.h"
 
+glm::vec3 Polygon::getNormal() const {
+    glm::vec3 edge1 = vertices[1]-vertices[0];
+    glm::vec3 edge2 = vertices[2]-vertices[0];
+    return glm::normalize(glm::cross(edge1, edge2));
+}
+
 Rectangle::Rectangle(const std::vector<glm::vec3> &vertices, const colorDBL &col) : Polygon(vertices, col) {
     if(vertices.size() != 4) {
         throw std::invalid_argument("Rectangle must have 4 vertices");

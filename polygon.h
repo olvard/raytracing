@@ -5,9 +5,7 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
-#include <glm/gtx/normal.hpp>
 #include <vector>
 #include "colorDBL.h"
 #include "ray.h"
@@ -25,9 +23,7 @@ public:
 
     const colorDBL& getColor() const { return color; }
 
-    glm::vec3 getNormal() const {
-        return glm::triangleNormal(vertices[0], vertices[1], vertices[2]);
-    }
+    glm::vec3 getNormal() const;
 
     virtual bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const = 0;
 

@@ -16,8 +16,8 @@ Camera::Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
 }
 
 Ray Camera::createRay(int x, int y) const {
-    float u = static_cast<float>(x) / width;
-    float v = static_cast<float>(y) / height;
+    float u = 1.0f - static_cast<float>(x) / width;
+    float v = 1.0f - static_cast<float>(y) / height;
     // Calculate point on the image plane with bilinear interpolation
     glm::vec3 point = (1-u)*(1-v)*c1 + u*(1-v)*c2 + u*v*c3 + (1-u)*v*c4;
     return Ray(eye, point);
@@ -47,7 +47,7 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene) const {
     }
 
     //else return black
-    return colorDBL(0,0,0);
+    return colorDBL(0.0,0.0,0.0);
 }
 
 
@@ -64,7 +64,7 @@ void Camera::render(const std::string& filename, const Scene& scene)  {
     double max_value = 0;
     for (const auto& row : pixels) {
         for (const auto& pixel : row) {
-            max_value = std::max({max_value, pixel.r, pixel.g, pixel.b});
+            max_value = std::max({max_value, pixel.r(), pixel.g(), pixel.b()});
         }
     }
 
@@ -74,9 +74,9 @@ void Camera::render(const std::string& filename, const Scene& scene)  {
 
     for (const auto& row : pixels) {
         for (const auto& pixel : row) {
-            char r = static_cast<char>(std::min(255.0, pixel.r / max_value * 255));
-            char g = static_cast<char>(std::min(255.0, pixel.g / max_value * 255));
-            char b = static_cast<char>(std::min(255.0, pixel.b / max_value * 255));
+            char r = static_cast<char>(std::min(255.0, pixel.r() / max_value * 255));
+            char g = static_cast<char>(std::min(255.0, pixel.g() / max_value * 255));
+            char b = static_cast<char>(std::min(255.0, pixel.b() / max_value * 255));
             out.write(&r, 1);
             out.write(&g, 1);
             out.write(&b, 1);

@@ -10,11 +10,12 @@
 class colorDBL {
 public:
     // Constructor
-    double r, g, b;
-    colorDBL(double r, double g, double b) : color(r, g, b) {}
+    explicit colorDBL(double r = 0.0, double g = 0.0, double b = 0.0) : color(r, g, b) {}
 
-    //default constructor initializes to black
-    colorDBL(): color(0.0, 0.0, 0.0), r(0.0), g(0.0), b(0.0) {}
+    // Getters
+    double r() const { return color.r; }
+    double g() const { return color.g; }
+    double b() const { return color.b; }
 
     // Convert color to glm::vec3
     glm::vec3 toVec3() const { return color; }
