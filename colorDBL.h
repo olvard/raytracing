@@ -17,6 +17,25 @@ public:
     double g() const { return color.g; }
     double b() const { return color.b; }
 
+    // Operators
+    colorDBL operator+(const colorDBL& c) const {
+        return colorDBL(r() + c.r(), g() + c.g(), b() + c.b());
+    }
+
+    colorDBL operator*(double f) const {
+        return colorDBL(r() * f, g() * f, b() * f);
+    }
+
+    // Friend function for float * colorDBL
+    friend colorDBL operator*(float f, const colorDBL& c) {
+        return colorDBL(c.r() * f, c.g() * f, c.b() * f);
+    }
+
+    // Friend function for double * colorDBL
+    friend colorDBL operator*(double f, const colorDBL& c) {
+        return c * f; // Reuse the member function
+    }
+
     // Convert color to glm::vec3
     glm::vec3 toVec3() const { return color; }
 

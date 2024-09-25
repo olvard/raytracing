@@ -23,7 +23,13 @@ Ray Camera::createRay(int x, int y) const {
     return Ray(eye, point);
 }
 
-colorDBL Camera::traceRay(const Ray &ray, const Scene &scene) const {
+colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
+
+    const int maxDepth = 5;
+    if (depth > maxDepth) {
+        return colorDBL(0.0, 0.0, 0.0);
+    }
+
     float closest_t = std::numeric_limits<float>::max();
     const Polygon* hit_polygon = nullptr;
     glm::vec3 hit_point;
@@ -41,8 +47,22 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene) const {
         }
     }
 
+    const float EPSILON = 0.0001f;
+
     //return the color of the hit polygon
     if(hit_polygon) {
+        if(hit_polygon->getMaterial() > 0.0f) {
+            glm::vec3 normal = hit_polygon->getNormal();
+            glm::vec3 ray_direction = ray.getDirection();
+            glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
+
+            glm::vec3 offset = hit_point + normal * EPSILON;
+
+            Ray reflection_ray(offset, offset + reflection_direction);
+            colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
+            return (1.0f - hit_polygon->getMaterial()) * hit_polygon->getColor() + hit_polygon->getMaterial() * reflected_color;
+
+        }
         return hit_polygon->getColor();
     }
 
@@ -52,11 +72,11 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene) const {
 
 
 
-void Camera::render(const std::string& filename, const Scene& scene)  {
+void Camera::render(const std::string& filename, const Scene& scene, int depth)  {
     for(int j = 0; j < height; j++) {
         for(int i = 0; i < width; i++) {
             Ray ray = createRay(i, j);
-            pixels[j][i] = traceRay(ray,scene);
+            pixels[j][i] = traceRay(ray,scene,depth);
         }
     }
 

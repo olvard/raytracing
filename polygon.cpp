@@ -9,7 +9,7 @@ glm::vec3 Polygon::getNormal() const {
     return glm::normalize(glm::cross(edge1, edge2));
 }
 
-Rectangle::Rectangle(const std::vector<glm::vec3> &vertices, const colorDBL &col) : Polygon(vertices, col) {
+Rectangle::Rectangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Polygon(vertices, col, material) {
     if(vertices.size() != 4) {
         throw std::invalid_argument("Rectangle must have 4 vertices");
     }
@@ -38,7 +38,7 @@ bool Rectangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint
     return false;
 }
 
-Triangle::Triangle(const std::vector<glm::vec3> &vertices, const colorDBL &col) : Polygon(vertices, col) {
+Triangle::Triangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Polygon(vertices, col, material) {
     if(vertices.size() != 3) {
         throw std::invalid_argument("Triangle must have 3 vertices");
     }

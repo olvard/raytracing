@@ -19,7 +19,7 @@ public:
     Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
            const glm::vec3& c3, const glm::vec3& c4, int width, int height);
 
-    void render(const std::string& filename, const Scene& scene);
+    void render(const std::string& filename, const Scene& scene, int depth);
 
 private:
     int width, height;
@@ -28,7 +28,7 @@ private:
     std::vector<std::vector<colorDBL>> pixels;
 
     Ray createRay(int x, int y) const;
-    colorDBL traceRay(const Ray& ray, const Scene& scene) const;
+    colorDBL traceRay(const Ray& ray, const Scene& scene, int depth) const;
 
 };
 

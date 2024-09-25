@@ -19,7 +19,7 @@ int main() {
     Camera camera(eye, c1, c2, c3, c4, 800, 600);  // Initialize the camera
 
     // Render the scene to a PPM file
-    camera.render("/Users/oliverlundin/Local Documents/github/raytracer/output.ppm", scene);
+    camera.render("/Users/oliverlundin/Local Documents/github/raytracer/output.ppm", scene, 0);
 
     std::cout << "Rendering complete!" << std::endl;
 
