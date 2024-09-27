@@ -5,13 +5,14 @@
 #ifndef SCENE_H
 #define SCENE_H
 #include <vector>
-
+#include "light.h"
 #include "polygon.h"
 
 
 class Scene {
 public:
     std::vector<std::unique_ptr<Polygon>> polygons;
+    std::vector<Light> lights;
 
 
    Scene() = default;

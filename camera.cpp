@@ -23,6 +23,44 @@ Ray Camera::createRay(int x, int y) const {
     return Ray(eye, point);
 }
 
+colorDBL Camera::calculateDirectLight(const glm::vec3 &point, const glm::vec3 &normal, const Scene &scene) const {
+    colorDBL direct_light(0.0, 0.0, 0.0); //Initialize the direct light to black
+    const int samples = 100;
+
+    for(const auto& light : scene.lights) {
+        for(int i = 0; i < samples; i++) {
+            glm::vec3 lightPoint = light.getRandomPoint();
+            glm::vec3 toLight = lightPoint - point;
+            float distance = glm::length(toLight);
+            glm::vec3 lightDir = glm::normalize(toLight);
+
+            float cosTheta = glm::max(0.0f,glm::dot(normal, lightDir));
+            float cosThetaLight = glm::max(0.0f,glm::dot(-lightDir, light.normal));
+
+            Ray shadowRay(point + normal * 0.001f, lightPoint);
+            bool inShadow = false;
+            for(const auto& polygon : scene.polygons) {
+                float t;
+                glm::vec3 intersectionPoint;
+                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distance) {
+                    inShadow = true;
+                    break;
+
+                }
+            }
+
+            if (!inShadow) {
+                float G = (cosTheta * cosThetaLight) / (distance * distance + 0.001f);
+                std::cout << "G: " << G << std::endl;
+                direct_light += light.intensity * G * light.area  / static_cast<float>(samples);
+            }
+        }
+    }
+
+    return direct_light;
+}
+
+
 colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
     const int maxDepth = 5;
@@ -51,6 +89,9 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
     //return the color of the hit polygon
     if(hit_polygon) {
+        colorDBL directLight = calculateDirectLight(hit_point, hit_polygon->getNormal(), scene);
+        colorDBL surfaceColor = hit_polygon->getColor();
+
         if(hit_polygon->getMaterial() > 0.0f) {
             glm::vec3 normal = hit_polygon->getNormal();
             glm::vec3 ray_direction = ray.getDirection();
@@ -63,7 +104,9 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
             return (1.0f - hit_polygon->getMaterial()) * hit_polygon->getColor() + hit_polygon->getMaterial() * reflected_color;
 
         }
-        return hit_polygon->getColor();
+        colorDBL finalColor = (surfaceColor * directLight) / M_PI;
+
+        return finalColor;
     }
 
     //else return black
@@ -94,12 +137,21 @@ void Camera::render(const std::string& filename, const Scene& scene, int depth) 
 
     for (const auto& row : pixels) {
         for (const auto& pixel : row) {
-            char r = static_cast<char>(std::min(255.0, pixel.r() / max_value * 255));
-            char g = static_cast<char>(std::min(255.0, pixel.g() / max_value * 255));
-            char b = static_cast<char>(std::min(255.0, pixel.b() / max_value * 255));
-            out.write(&r, 1);
-            out.write(&g, 1);
-            out.write(&b, 1);
+            // Check if max_value is greater than a small epsilon to avoid division by zero
+            if (max_value > 1e-6) {
+                char r = static_cast<char>(std::min(255.0, pixel.r() / max_value * 255));
+                char g = static_cast<char>(std::min(255.0, pixel.g() / max_value * 255));
+                char b = static_cast<char>(std::min(255.0, pixel.b() / max_value * 255));
+                out.write(&r, 1);
+                out.write(&g, 1);
+                out.write(&b, 1);
+            } else {
+                // If max_value is essentially zero, write black pixels
+                char zero = 0;
+                out.write(&zero, 1);
+                out.write(&zero, 1);
+                out.write(&zero, 1);
+            }
         }
     }
 }

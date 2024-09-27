@@ -22,8 +22,24 @@ public:
         return colorDBL(r() + c.r(), g() + c.g(), b() + c.b());
     }
 
+    // multiplication with float operator
     colorDBL operator*(double f) const {
         return colorDBL(r() * f, g() * f, b() * f);
+    }
+
+    // multiplication with colorDBL operator
+    colorDBL operator*(const colorDBL& c) const {
+        return colorDBL(r() * c.r(), g() * c.g(), b() * c.b());
+    }
+
+    // += operator
+    colorDBL operator+=(const colorDBL& other) const {
+        return colorDBL(r() + other.r(), g() + other.g(), b() + other.b());
+    }
+
+    // division with float operator
+    colorDBL operator/(float f) const {
+        return colorDBL(r() / f, g() / f, b() / f);
     }
 
     // Friend function for float * colorDBL

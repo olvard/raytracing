@@ -28,6 +28,7 @@ private:
     std::vector<std::vector<colorDBL>> pixels;
 
     Ray createRay(int x, int y) const;
+    colorDBL calculateDirectLight(const glm::vec3& point, const glm::vec3& normal, const Scene& scene) const;
     colorDBL traceRay(const Ray& ray, const Scene& scene, int depth) const;
 
 };
