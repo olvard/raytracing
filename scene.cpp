@@ -31,23 +31,23 @@ void Scene::addRoom() {
     // Ceiling
     std::vector<glm::vec3> squareVertices_c = {
         {0.0f, -6.0f, 5.0f},
-        {10.0f, -6.0f, 5.0f},
+        {0.0f, 6.0f, 5.0f},
         {10.0f, 6.0f, 5.0f},
-        {0.0f, 6.0f, 5.0f}
+        {10.0f, -6.0f, 5.0f},
     };
     polygons.push_back(std::make_unique<Rectangle>(squareVertices_c, colorDBL(0.0, 0.4, 0.0),0.0f));  // Green square
 
     std::vector<glm::vec3> triangleVertices_cl = {
         {0.0f, -6.0f, 5.0f},
+        {-3.0f, 0.0f, 5.0f},
         {0.0f, 6.0f, 5.0f},
-        {-3.0f, 0.0f, 5.0f}
     };
     polygons.push_back(std::make_unique<Triangle>(triangleVertices_cl, colorDBL(0.4, 0.0, 0.0),0.0f));  // Red triangle
 
     std::vector<glm::vec3> triangleVertices_cr = {
-        {10.0f, -6.0f, 5.0f},
-        {13.0f, 0.0f, 5.0f},
         {10.0f, 6.0f, 5.0f},
+        {13.0f, 0.0f, 5.0f},
+        {10.0f, -6.0f, 5.0f}
     };
     polygons.push_back(std::make_unique<Triangle>(triangleVertices_cr, colorDBL(0.4, 0.0, 0.0),0.0f));  // Red triangle
 

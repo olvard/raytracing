@@ -24,11 +24,8 @@ public:
     Light(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4, const colorDBL& intensity) :
     v1(v1), v2(v2), v3(v3), v4(v4), intensity(intensity) {
         glm::vec3 e1 = v2 - v1;
-        glm::vec3 e2 = v3 - v1;
+        glm::vec3 e2 = v4 - v1;
         normal = normalize(cross(e1, e2));
-        if (normal.z > 0) {
-            normal = -normal;
-        }
         area = length(e1) * length(e2);
     }
 
@@ -39,7 +36,7 @@ public:
 
         float s = dis(gen);
         float t = dis(gen);
-        return v1 + s * (v2 - v1) + t * (v3 - v1);
+        return v1 + s * (v2 - v1) + t * (v4 - v1);
     }
 
     void debugPrint() const {

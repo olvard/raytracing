@@ -23,41 +23,40 @@ Ray Camera::createRay(int x, int y) const {
     return Ray(eye, point);
 }
 
-colorDBL Camera::calculateDirectLight(const glm::vec3 &point, const glm::vec3 &normal, const Scene &scene) const {
-    colorDBL direct_light(0.0, 0.0, 0.0); //Initialize the direct light to black
+float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &hitPointNormal, const Scene &scene) const {
+    float irradiance = 0.0f; //Initialize the direct light to black
     const int samples = 100;
 
     for(const auto& light : scene.lights) {
         for(int i = 0; i < samples; i++) {
-            glm::vec3 lightPoint = light.getRandomPoint();
-            glm::vec3 toLight = lightPoint - point;
-            float distance = glm::length(toLight);
-            glm::vec3 lightDir = glm::normalize(toLight);
+            glm::vec3 pointOnLight = light.getRandomPoint();
+            glm::vec3 direction = glm::normalize(pointOnLight - hitPoint);
+            float distanceToLight = glm::distance(pointOnLight, hitPoint);
 
-            float cosTheta = glm::max(0.0f,glm::dot(normal, lightDir));
-            float cosThetaLight = glm::max(0.0f,glm::dot(-lightDir, light.normal));
+            float cosTheta = glm::dot(hitPointNormal,direction);
+            float cosThetaLight = glm::dot(-light.normal,direction);
 
-            Ray shadowRay(point + normal * 0.001f, lightPoint);
+            Ray shadowRay(hitPoint + hitPointNormal * 0.001f, pointOnLight);
             bool inShadow = false;
             for(const auto& polygon : scene.polygons) {
                 float t;
                 glm::vec3 intersectionPoint;
-                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distance) {
-                    inShadow = true;
+                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distanceToLight) {
+                    inShadow = false;
                     break;
-
                 }
             }
 
             if (!inShadow) {
-                float G = (cosTheta * cosThetaLight) / (distance * distance + 0.001f);
-                std::cout << "G: " << G << std::endl;
-                direct_light += light.intensity * G * light.area  / static_cast<float>(samples);
+                irradiance += std::max(0.0f, (cosTheta * cosThetaLight) / (distanceToLight * distanceToLight));
+
             }
         }
     }
+    float radiance = 250.0f;
+    irradiance = (irradiance * scene.lights[0].area * radiance) / (samples * M_PI);
 
-    return direct_light;
+    return irradiance;
 }
 
 
@@ -89,8 +88,10 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
     //return the color of the hit polygon
     if(hit_polygon) {
-        colorDBL directLight = calculateDirectLight(hit_point, hit_polygon->getNormal(), scene);
+        float irradiance = calculateDirectLight(hit_point, hit_polygon->getNormal(), scene);
         colorDBL surfaceColor = hit_polygon->getColor();
+
+        //TODO: Implement ray tracing for diffuse materials?
 
         if(hit_polygon->getMaterial() > 0.0f) {
             glm::vec3 normal = hit_polygon->getNormal();
@@ -99,16 +100,17 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
             glm::vec3 offset = hit_point + normal * EPSILON;
 
-            Ray reflection_ray(offset, offset + reflection_direction);
+            Ray reflection_ray(offset, offset + reflection_direction, hit_polygon->getColor());
             colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
             return (1.0f - hit_polygon->getMaterial()) * hit_polygon->getColor() + hit_polygon->getMaterial() * reflected_color;
-
         }
-        colorDBL finalColor = (surfaceColor * directLight) / M_PI;
+
+        // std::cout << "Direct light: R=" << directLight.r() << ", G=" << directLight.g() << ", B=" << directLight.b() << std::endl;
+        colorDBL finalColor = surfaceColor * irradiance;
 
         return finalColor;
     }
-
+    
     //else return black
     return colorDBL(0.0,0.0,0.0);
 }

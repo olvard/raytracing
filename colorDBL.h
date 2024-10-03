@@ -33,8 +33,11 @@ public:
     }
 
     // += operator
-    colorDBL operator+=(const colorDBL& other) const {
-        return colorDBL(r() + other.r(), g() + other.g(), b() + other.b());
+    colorDBL& operator+=(const colorDBL& other) {
+        color.r += other.r();
+        color.g += other.g();
+        color.b += other.b();
+        return *this;
     }
 
     // division with float operator
@@ -57,6 +60,7 @@ public:
 
 protected:
     glm::vec3 color;
+
 
 
 };
