@@ -3,6 +3,8 @@
 //
 #include "polygon.h"
 
+#include <unordered_set>
+
 glm::vec3 Polygon::getNormal() const {
     glm::vec3 edge1 = vertices[1]-vertices[0];
     glm::vec3 edge2 = vertices[2]-vertices[0];
@@ -91,9 +93,5 @@ bool Triangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint)
     // Line intersects the plane of the triangle, but not the triangle itself
     return false;
 }
-
-
-
-
 
 

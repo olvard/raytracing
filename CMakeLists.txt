@@ -14,4 +14,5 @@ add_executable(raytracer main.cpp
         ray.cpp
         ray.h
         light.cpp
-        light.h)
+        light.h
+)

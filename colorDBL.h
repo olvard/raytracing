@@ -27,6 +27,11 @@ public:
         return colorDBL(r() * f, g() * f, b() * f);
     }
 
+    // addition with float operator
+    colorDBL operator+(double f) const {
+        return colorDBL(r() + f, g() + f, b() + f);
+    }
+
     // multiplication with colorDBL operator
     colorDBL operator*(const colorDBL& c) const {
         return colorDBL(r() * c.r(), g() * c.g(), b() * c.b());
@@ -49,6 +54,7 @@ public:
     friend colorDBL operator*(float f, const colorDBL& c) {
         return colorDBL(c.r() * f, c.g() * f, c.b() * f);
     }
+
 
     // Friend function for double * colorDBL
     friend colorDBL operator*(double f, const colorDBL& c) {

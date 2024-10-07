@@ -24,41 +24,46 @@ Ray Camera::createRay(int x, int y) const {
 }
 
 float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &hitPointNormal, const Scene &scene) const {
-    float irradiance = 0.0f; //Initialize the direct light to black
-    const int samples = 100;
+    float irradiance = 0.0f;
+    const int samples = 20;
 
     for(const auto& light : scene.lights) {
         for(int i = 0; i < samples; i++) {
             glm::vec3 pointOnLight = light.getRandomPoint();
-            glm::vec3 direction = glm::normalize(pointOnLight - hitPoint);
-            float distanceToLight = glm::distance(pointOnLight, hitPoint);
 
-            float cosTheta = glm::dot(hitPointNormal,direction);
-            float cosThetaLight = glm::dot(-light.normal,direction);
+            // Calculate the direction from hit point to light
+            glm::vec3 direction = pointOnLight - hitPoint;
+            float distanceToLight = glm::length(direction);
+            direction = glm::normalize(direction);
 
-            Ray shadowRay(hitPoint + hitPointNormal * 0.001f, pointOnLight);
+            float cosTheta = glm::dot(hitPointNormal, direction);
+            float cosThetaLight = glm::dot(-light.normal, direction);
+
+            // Create shadow ray with normalized direction
+            Ray shadowRay(hitPoint + hitPointNormal * 0.001f, direction);
             bool inShadow = false;
+
             for(const auto& polygon : scene.polygons) {
                 float t;
                 glm::vec3 intersectionPoint;
-                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distanceToLight) {
-                    inShadow = false;
+                // Check if intersection distance is less than distance to light
+                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distanceToLight - 0.001f) {
+                    inShadow = true;
                     break;
                 }
             }
 
-            if (!inShadow) {
-                irradiance += std::max(0.0f, (cosTheta * cosThetaLight) / (distanceToLight * distanceToLight));
-
+            if (!inShadow && cosTheta > 0.0f && cosThetaLight > 0.0f) {
+                irradiance += (cosTheta * cosThetaLight) / (distanceToLight * distanceToLight);
             }
         }
     }
-    float radiance = 250.0f;
+
+    float radiance = 8500.0f;
     irradiance = (irradiance * scene.lights[0].area * radiance) / (samples * M_PI);
 
     return irradiance;
 }
-
 
 colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
@@ -91,8 +96,6 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
         float irradiance = calculateDirectLight(hit_point, hit_polygon->getNormal(), scene);
         colorDBL surfaceColor = hit_polygon->getColor();
 
-        //TODO: Implement ray tracing for diffuse materials?
-
         if(hit_polygon->getMaterial() > 0.0f) {
             glm::vec3 normal = hit_polygon->getNormal();
             glm::vec3 ray_direction = ray.getDirection();
@@ -105,12 +108,13 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
             return (1.0f - hit_polygon->getMaterial()) * hit_polygon->getColor() + hit_polygon->getMaterial() * reflected_color;
         }
 
-        // std::cout << "Direct light: R=" << directLight.r() << ", G=" << directLight.g() << ", B=" << directLight.b() << std::endl;
         colorDBL finalColor = surfaceColor * irradiance;
-
+        std::cout << "Irradiance: " << irradiance << std::endl;
+        std::cout << "Surface color: " << surfaceColor.r() << " " << surfaceColor.g() << " " << surfaceColor.b() << std::endl;
+        std::cout << "Final color: " << finalColor.r() << " " << finalColor.g() << " " << finalColor.b() << std::endl;
         return finalColor;
     }
-    
+
     //else return black
     return colorDBL(0.0,0.0,0.0);
 }
@@ -141,9 +145,9 @@ void Camera::render(const std::string& filename, const Scene& scene, int depth) 
         for (const auto& pixel : row) {
             // Check if max_value is greater than a small epsilon to avoid division by zero
             if (max_value > 1e-6) {
-                char r = static_cast<char>(std::min(255.0, pixel.r() / max_value * 255));
-                char g = static_cast<char>(std::min(255.0, pixel.g() / max_value * 255));
-                char b = static_cast<char>(std::min(255.0, pixel.b() / max_value * 255));
+                char r = static_cast<char>(std::min(255.0, pixel.r() ));
+                char g = static_cast<char>(std::min(255.0, pixel.g() ));
+                char b = static_cast<char>(std::min(255.0, pixel.b() ));
                 out.write(&r, 1);
                 out.write(&g, 1);
                 out.write(&b, 1);

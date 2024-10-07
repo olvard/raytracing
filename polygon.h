@@ -45,7 +45,10 @@ class Triangle : public Polygon {
 public:
     Triangle(const std::vector<glm::vec3>& vertices, const colorDBL& col, float material);
     bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const override;
+
 };
+
+
 
 
 #endif //POLYGON_H
