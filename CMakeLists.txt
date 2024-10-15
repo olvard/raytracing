@@ -15,4 +15,5 @@ add_executable(raytracer main.cpp
         light.h
         shape.cpp
         shape.h
+        Material.h
 )

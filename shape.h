@@ -9,29 +9,30 @@
 #include "colorDBL.h"
 #include "ray.h"
 #include <vector>
+#include "material.h"
 
 // Abstract base class for all shapes
 // shape.h
 class Shape {
 public:
-    Shape(const colorDBL& color, float material) : color(color), material(material) {}
+    Shape(const colorDBL& color, Material material) : color(color), material(material) {}
     virtual ~Shape() = default;
 
     virtual bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const = 0;
     virtual glm::vec3 getNormal(glm::vec3& point) const = 0;
 
-    float getMaterial() const { return material; }
+    Material getMaterial() const { return material; }
     const colorDBL& getColor() const { return color; }
 
 protected:
     colorDBL color;
-    float material;
+    Material material;
 };
 
 // polygon.h
 class Rectangle : public Shape {
 public:
-    Rectangle(const std::vector<glm::vec3>& vertices, const colorDBL& col, float material)
+    Rectangle(const std::vector<glm::vec3>& vertices, const colorDBL& col, Material material)
         : Shape(col, material), vertices(vertices) {}
 
     bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const override;
@@ -43,7 +44,7 @@ private:
 
 class Triangle : public Shape {
 public:
-    Triangle(const std::vector<glm::vec3>& vertices, const colorDBL& col, float material)
+    Triangle(const std::vector<glm::vec3>& vertices, const colorDBL& col, Material material)
         : Shape(col, material), vertices(vertices) {}
 
     bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const override;
@@ -56,7 +57,7 @@ private:
 // sphere.h
 class Sphere : public Shape {
 public:
-    Sphere(glm::vec3 center, float radius, const colorDBL& color, float material)
+    Sphere(glm::vec3 center, float radius, const colorDBL& color, Material material)
         : Shape(color, material), center(center), radius(radius) {}
 
     bool intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const override;

@@ -59,7 +59,7 @@ float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &h
         }
     }
 
-    float radiance = 8500.0f;
+    float radiance = 5500.0f;
     irradiance = (irradiance * scene.lights[0].area * radiance) / (samples * M_PI);
 
     return irradiance;
@@ -96,7 +96,11 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
         float irradiance = calculateDirectLight(hit_point, hit_shape->getNormal(hit_point), scene);
         colorDBL surfaceColor = hit_shape->getColor();
 
-        if(hit_shape->getMaterial() > 0.0f) {
+        // Diffuse
+
+
+        // Mirror
+        if(hit_shape->getMaterial().getType() == Material::MIRROR) {
             glm::vec3 normal = hit_shape->getNormal(hit_point);
             glm::vec3 ray_direction = ray.getDirection();
             glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
@@ -105,21 +109,19 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
             Ray reflection_ray(offset, offset + reflection_direction, hit_shape->getColor());
             colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
-            return (1.0f - hit_shape->getMaterial()) * hit_shape->getColor() + hit_shape->getMaterial() * reflected_color;
+            return reflected_color;
         }
 
         colorDBL finalColor = surfaceColor * irradiance;
-        std::cout << "Irradiance: " << irradiance << std::endl;
+        /*std::cout << "Irradiance: " << irradiance << std::endl;
         std::cout << "Surface color: " << surfaceColor.r() << " " << surfaceColor.g() << " " << surfaceColor.b() << std::endl;
-        std::cout << "Final color: " << finalColor.r() << " " << finalColor.g() << " " << finalColor.b() << std::endl;
+        std::cout << "Final color: " << finalColor.r() << " " << finalColor.g() << " " << finalColor.b() << std::endl;*/
         return finalColor;
     }
 
     //else return black
     return colorDBL(0.0,0.0,0.0);
 }
-
-
 
 void Camera::render(const std::string& filename, const Scene& scene, int depth)  {
     for(int j = 0; j < height; j++) {
