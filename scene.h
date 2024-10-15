@@ -6,24 +6,33 @@
 #define SCENE_H
 #include <vector>
 #include "light.h"
-#include "polygon.h"
+#include "shape.h"
+
 
 
 
 class Scene {
 public:
-    std::vector<std::unique_ptr<Polygon>> polygons;
+    std::vector<std::unique_ptr<Shape>> shapes;
     std::vector<Light> lights;
 
 
    Scene() = default;
 
-    // Add a polygon to the scene
-    void addPolygon(std::unique_ptr<Polygon> polygon) {
-        polygons.push_back(std::move(polygon));
+    // Add a shape to the scene (polygon or sphere)
+    void addShape(std::unique_ptr<Shape> shape) {
+        shapes.push_back(std::move(shape));
     }
 
-    // Add a tetrahedron to the scene
+    // Add a polygon to the scene (wraps addShape)
+
+
+    // Add a sphere to the scene (wraps addShape)
+    void addSphere(const glm::vec3& center, float radius, const colorDBL& color, float material) {
+        shapes.push_back(std::make_unique<Sphere>(center, radius, color, material));
+    }
+
+    // Add a tetrahedron to the scene (similar to Polygon or as another Shape subclass)
     void addTetrahedron(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4, const colorDBL& color, float material);
 
 

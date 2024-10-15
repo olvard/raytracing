@@ -43,11 +43,11 @@ float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &h
             Ray shadowRay(hitPoint + hitPointNormal * 0.001f, direction);
             bool inShadow = false;
 
-            for(const auto& polygon : scene.polygons) {
+            for(const auto& shape : scene.shapes) {
                 float t;
                 glm::vec3 intersectionPoint;
                 // Check if intersection distance is less than distance to light
-                if(polygon->intersect(shadowRay, t, intersectionPoint) && t < distanceToLight - 0.001f) {
+                if(shape->intersect(shadowRay, t, intersectionPoint) && t < distanceToLight - 0.001f) {
                     inShadow = true;
                     break;
                 }
@@ -73,17 +73,17 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
     }
 
     float closest_t = std::numeric_limits<float>::max();
-    const Polygon* hit_polygon = nullptr;
+    const Shape* hit_shape = nullptr;
     glm::vec3 hit_point;
 
     //Loop through the polygons in the scene
-    for (const auto& polygon : scene.polygons) {
+    for (const auto& shape : scene.shapes) {
         float t;
         glm::vec3 intersectionPoint;
-        if (polygon->intersect(ray, t, intersectionPoint)) {
+        if (shape->intersect(ray, t, intersectionPoint)) {
             if(t < closest_t) {
                 closest_t = t;
-                hit_polygon = polygon.get();
+                hit_shape = shape.get();
                 hit_point = intersectionPoint;
             }
         }
@@ -92,20 +92,20 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
     const float EPSILON = 0.0001f;
 
     //return the color of the hit polygon
-    if(hit_polygon) {
-        float irradiance = calculateDirectLight(hit_point, hit_polygon->getNormal(), scene);
-        colorDBL surfaceColor = hit_polygon->getColor();
+    if(hit_shape) {
+        float irradiance = calculateDirectLight(hit_point, hit_shape->getNormal(hit_point), scene);
+        colorDBL surfaceColor = hit_shape->getColor();
 
-        if(hit_polygon->getMaterial() > 0.0f) {
-            glm::vec3 normal = hit_polygon->getNormal();
+        if(hit_shape->getMaterial() > 0.0f) {
+            glm::vec3 normal = hit_shape->getNormal(hit_point);
             glm::vec3 ray_direction = ray.getDirection();
             glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
 
             glm::vec3 offset = hit_point + normal * EPSILON;
 
-            Ray reflection_ray(offset, offset + reflection_direction, hit_polygon->getColor());
+            Ray reflection_ray(offset, offset + reflection_direction, hit_shape->getColor());
             colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
-            return (1.0f - hit_polygon->getMaterial()) * hit_polygon->getColor() + hit_polygon->getMaterial() * reflected_color;
+            return (1.0f - hit_shape->getMaterial()) * hit_shape->getColor() + hit_shape->getMaterial() * reflected_color;
         }
 
         colorDBL finalColor = surfaceColor * irradiance;

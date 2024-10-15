@@ -7,12 +7,12 @@ add_executable(raytracer main.cpp
         scene.h
         camera.cpp
         camera.h
-        polygon.h
         colorDBL.h
-        polygon.cpp
         scene.cpp
         ray.cpp
         ray.h
         light.cpp
         light.h
+        shape.cpp
+        shape.h
 )

@@ -1,7 +1,5 @@
 #include <iostream>
 #include <glm/glm.hpp>
-#include "polygon.h"
-#include "colorDBL.h"
 #include "scene.h"
 #include "camera.h"
 

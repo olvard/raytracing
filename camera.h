@@ -6,7 +6,6 @@
 #define CAMERA_H
 
 #include <iostream>
-#include "polygon.h"
 #include <glm/glm.hpp>
 #include <vector>
 #include "colorDBL.h"

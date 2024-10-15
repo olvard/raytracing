@@ -1,24 +1,30 @@
+
 //
 // Created by Oliver Lundin on 2024-09-10.
 //
-#include "polygon.h"
 
-#include <unordered_set>
+#include "shape.h"
 
-glm::vec3 Polygon::getNormal() const {
+glm::vec3 Rectangle::getNormal(glm::vec3& point) const {
     glm::vec3 edge1 = vertices[1]-vertices[0];
     glm::vec3 edge2 = vertices[2]-vertices[0];
     return glm::normalize(glm::cross(edge1, edge2));
 }
 
-Rectangle::Rectangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Polygon(vertices, col, material) {
+glm::vec3 Triangle::getNormal(glm::vec3& point) const {
+    glm::vec3 edge1 = vertices[1]-vertices[0];
+    glm::vec3 edge2 = vertices[2]-vertices[0];
+    return glm::normalize(glm::cross(edge1, edge2));
+}
+
+/*Rectangle::Rectangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Shape(col, material) {
     if(vertices.size() != 4) {
         throw std::invalid_argument("Rectangle must have 4 vertices");
     }
-}
+}*/
 
 bool Rectangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const {
-    glm::vec3 normal = getNormal();
+    glm::vec3 normal = getNormal(intersectionPoint);
     float denominator = glm::dot(normal, ray.getDirection());
 
     if (std::abs(denominator) > 1e-6) {
@@ -40,11 +46,11 @@ bool Rectangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint
     return false;
 }
 
-Triangle::Triangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Polygon(vertices, col, material) {
+/*Triangle::Triangle(const std::vector<glm::vec3> &vertices, const colorDBL &col, float material) : Shape(col, material) {
     if(vertices.size() != 3) {
         throw std::invalid_argument("Triangle must have 3 vertices");
     }
-}
+}*/
 
 bool Triangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const {
     const float EPSILON = 0.0000001;
@@ -95,3 +101,47 @@ bool Triangle::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint)
 }
 
 
+// intersection method
+bool Sphere::intersect(const Ray& ray, float& t, glm::vec3& intersectionPoint) const {
+    // Vector from ray origin to sphere center
+    glm::vec3 SC = ray.ps - center;
+
+    // Coefficients for the quadratic equation
+    float c1 = glm::dot(ray.getDirection(), ray.getDirection());  // c1 = D^2
+    float c2 = 2.0f * glm::dot(ray.getDirection(), SC);      // c2 = 2 * D * (S - C)
+    float c3 = glm::dot(SC, SC) - radius * radius;      // c3 = (S - C)^2 - r^2
+
+    // Discriminant of the quadratic equation
+    float discriminant = c2 * c2 - 4.0f * c1 * c3;
+
+    // No intersection if the discriminant is negative
+    if (discriminant < 0.0f) {
+        return false; // No intersection
+    }
+
+    // Compute the two possible values of t (time along the ray)
+    float sqrtDiscriminant = std::sqrt(discriminant);
+    float t1 = (-c2 - sqrtDiscriminant) / (2.0f * c1);
+    float t2 = (-c2 + sqrtDiscriminant) / (2.0f * c1);
+
+    // Select the smallest positive t value (if any)
+    if (t1 >= 0.0f) {
+        t = t1; // The first intersection point
+    } else if (t2 >= 0.0f) {
+        t = t2; // The second intersection point
+    } else {
+        return false; // Both t1 and t2 are negative, meaning the intersection is behind the ray
+    }
+
+    // Compute the intersection point using the ray equation: P = S + t * D
+    intersectionPoint = ray.ps + t * ray.getDirection();
+
+    return true; // Intersection found
+}
+
+// get normal
+glm::vec3 Sphere::getNormal(glm::vec3& point) const {
+
+    return glm::normalize(point - center);
+
+}
