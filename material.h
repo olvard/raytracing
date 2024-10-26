@@ -12,7 +12,8 @@ public:
     enum MaterialType {
         DIFFUSE,
         MIRROR,
-        GLASS
+        GLASS,
+        LIGHT
     };
 
     // Constructor

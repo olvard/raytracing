@@ -119,28 +119,30 @@ void Scene::addRoom() {
 
     // Add objects
 
-    glm::vec3 v1(6.0f, 0.0f, -4.0f);
-    glm::vec3 v2(8.0f, -2.0f, -4.0f);
-    glm::vec3 v3(8.0f, 2.0f, -4.0f);
-    glm::vec3 v4(7.0f, 0.0f, -2.0f);
+    glm::vec3 v1(5.0f, 2.0f, -4.0f);
+    glm::vec3 v2(7.0f, 0.0f, -4.0f);
+    glm::vec3 v3(7.0f, 4.0f, -4.0f);
+    glm::vec3 v4(6.0f, 2.0f, 0.0f); // top
     addTetrahedron(v1, v2, v3, v4, colorDBL(0.7, 0.2, 0.5), Material(Material::DIFFUSE));
 
     // add sphere
     addSphere(glm::vec3(4.0f, -3.0f, 0.0f), 1.0f, colorDBL(0.7, 0.2, 0.3), Material(Material::DIFFUSE));
 
-    // Light polygon
+    // Light
     std::vector<glm::vec3> lightVertices = {
-        {2.0f, -2.0f, 4.1f},
-        {2.0f, 2.0f, 4.1f},
-        {6.0f, 2.0f, 4.1f},
-        {6.0f, -2.0f, 4.1f}
-    };
-    shapes.push_back(std::make_unique<Rectangle>(lightVertices, colorDBL(1.0, 1.0, 1.0),Material(Material::DIFFUSE)));  // Light
+        {2.0f, -1.0f, 4.9f},
+        {2.0f, 1.0f, 4.9f},
+        {6.0f, -1.0f, 4.9f},
+        {6.0f, 1.0f, 4.9f},
 
-    //Lights
+    };
+    shapes.push_back(std::make_unique<Rectangle>(lightVertices, colorDBL(1.0, 1.0, 1.0), Material(Material::LIGHT)));
+
+    // Lights array
     lights.emplace_back(
-    glm::vec3(2, -2, 4), glm::vec3(2, 2, 4), glm::vec3(6, 2, 4), glm::vec3(6, -2, 4),colorDBL(1.0, 1.0, 1.0)
+        glm::vec3(2.0f, 1.0f, 4.8f), glm::vec3(6.0f, 1.0f, 4.8f), glm::vec3(6.0f, -1.0f, 4.8f), glm::vec3(2.0f, -1.0f, 4.8f), colorDBL(1.0, 1.0, 1.0)
     );
+
 
     lights.back().debugPrint();
 }

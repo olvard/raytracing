@@ -28,8 +28,9 @@ private:
 
     Ray createRay(int x, int y) const;
     float calculateDirectLight(const glm::vec3& hitPoint, const glm::vec3& hitPointNormal, const Scene& scene) const;
-    colorDBL traceRay(const Ray& ray, const Scene& scene, int depth) const;
+    colorDBL traceRay(Ray& ray, const Scene& scene, int depth) const;
 
+    void renderSegment(int startRow, int endRow, const Scene &scene, int depth);
 };
 
 #endif //CAMERA_H

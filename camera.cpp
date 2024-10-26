@@ -7,7 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <glm/glm.hpp>
-#include <algorithm>
+#include <thread>
+#include <mutex>
 
 Camera::Camera(const glm::vec3& eye, const glm::vec3& c1, const glm::vec3& c2,
          const glm::vec3& c3, const glm::vec3& c4, int width, int height)
@@ -25,7 +26,7 @@ Ray Camera::createRay(int x, int y) const {
 
 float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &hitPointNormal, const Scene &scene) const {
     float irradiance = 0.0f;
-    const int samples = 20;
+    const int samples = 12;
 
     for(const auto& light : scene.lights) {
         for(int i = 0; i < samples; i++) {
@@ -59,15 +60,22 @@ float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &h
         }
     }
 
-    float radiance = 5500.0f;
+    float radiance = 8500.0f;
     irradiance = (irradiance * scene.lights[0].area * radiance) / (samples * M_PI);
 
     return irradiance;
 }
 
-colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
+float getRandom() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+    return dis(gen);
+}
 
-    const int maxDepth = 5;
+colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
+
+    const int maxDepth = 4;
     if (depth > maxDepth) {
         return colorDBL(0.0, 0.0, 0.0);
     }
@@ -93,42 +101,123 @@ colorDBL Camera::traceRay(const Ray &ray, const Scene &scene, int depth) const {
 
     //return the color of the hit polygon
     if(hit_shape) {
-        float irradiance = calculateDirectLight(hit_point, hit_shape->getNormal(hit_point), scene);
-        colorDBL surfaceColor = hit_shape->getColor();
+        glm::vec3 normal = hit_shape->getNormal(hit_point);
+        Material::MaterialType material_type = hit_shape->getMaterial().getType();
 
-        // Diffuse
+        switch (material_type) {
 
+            case Material::LIGHT: {
+                return hit_shape->getColor() * 500.0f;
+            }
 
-        // Mirror
-        if(hit_shape->getMaterial().getType() == Material::MIRROR) {
-            glm::vec3 normal = hit_shape->getNormal(hit_point);
-            glm::vec3 ray_direction = ray.getDirection();
-            glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
+            // Mirror
+            case Material::MIRROR: {
+                //glm::vec3 normal = hit_shape->getNormal(hit_point);
+                glm::vec3 ray_direction = ray.getDirection();
+                glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
 
-            glm::vec3 offset = hit_point + normal * EPSILON;
+                glm::vec3 offset = hit_point + normal * EPSILON;
 
-            Ray reflection_ray(offset, offset + reflection_direction, hit_shape->getColor());
-            colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
-            return reflected_color;
+                Ray reflection_ray(offset, offset + reflection_direction, hit_shape->getColor());
+                colorDBL reflected_color = traceRay(reflection_ray, scene, depth + 1);
+                return reflected_color;
+            }
+
+            // Diffuse
+            case Material::DIFFUSE: {
+               // Generate random direction in hemisphere for diffuse reflection
+                const int numSamples = 12;  // Number of random samples for diffuse reflection
+                colorDBL accumulated_color(0.0, 0.0, 0.0);
+
+                for(int i = 0; i < numSamples; i++) {
+                    // Generate random direction in hemisphere
+                    float theta = 2.0f * M_PI * getRandom();
+                    float phi = acos(sqrt(getRandom()));
+
+                    // Convert spherical to cartesian coordinates
+                    glm::vec3 random_direction(
+                        sin(phi) * cos(theta),
+                        sin(phi) * sin(theta),
+                        cos(phi)
+                    );
+
+                    // Create orthonormal basis around normal
+                    glm::vec3 w = normal;
+                    glm::vec3 u = glm::normalize(glm::cross(
+                        (std::abs(w.x) > 0.1f ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(1.0f, 0.0f, 0.0f)),
+                        w));
+                    glm::vec3 v = glm::cross(w, u);
+
+                    // Transform random direction to world space
+                    glm::vec3 world_direction =
+                        u * random_direction.x +
+                        v * random_direction.y +
+                        w * random_direction.z;
+
+                    glm::vec3 offset = hit_point + normal * EPSILON;
+
+                    // Create and link new ray
+                    auto diffuse_ray = std::make_shared<Ray>(
+                        offset,
+                        offset + world_direction,
+                        hit_shape->getColor()
+                    );
+                    ray.setNextRay(diffuse_ray);
+
+                    // Trace the ray and accumulate color
+                    colorDBL bounce_color = traceRay(*diffuse_ray, scene, depth + 1);
+                    float cosTheta = glm::dot(world_direction, normal);
+
+                    // Accumulate color using BRDF and cosine term
+                    accumulated_color = accumulated_color +
+                        (bounce_color * hit_shape->getColor() * cosTheta);
+                }
+
+                // Calculate direct lighting
+                float direct_irradiance = calculateDirectLight(hit_point, normal, scene);
+                colorDBL direct_light = hit_shape->getColor() * direct_irradiance;
+
+                // Combine direct and indirect lighting
+                return direct_light + (accumulated_color * (1.0f / numSamples));
+            }
         }
 
-        colorDBL finalColor = surfaceColor * irradiance;
-        /*std::cout << "Irradiance: " << irradiance << std::endl;
-        std::cout << "Surface color: " << surfaceColor.r() << " " << surfaceColor.g() << " " << surfaceColor.b() << std::endl;
-        std::cout << "Final color: " << finalColor.r() << " " << finalColor.g() << " " << finalColor.b() << std::endl;*/
-        return finalColor;
     }
 
     //else return black
     return colorDBL(0.0,0.0,0.0);
 }
 
-void Camera::render(const std::string& filename, const Scene& scene, int depth)  {
-    for(int j = 0; j < height; j++) {
+void Camera::renderSegment(int startRow, int endRow, const Scene& scene, int depth) {
+    for(int j = startRow; j < endRow; j++) {
         for(int i = 0; i < width; i++) {
             Ray ray = createRay(i, j);
-            pixels[j][i] = traceRay(ray,scene,depth);
+            pixels[j][i] = traceRay(ray, scene, depth);
         }
+    }
+}
+
+void Camera::render(const std::string& filename, const Scene& scene, int depth) {
+    // Determine number of threads (use hardware concurrency or fall back to 4)
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    numThreads = numThreads > 0 ? numThreads : 4;
+
+    // Calculate rows per thread
+    int rowsPerThread = height / numThreads;
+    std::vector<std::thread> threads;
+
+    // Create and launch threads
+    for(unsigned int i = 0; i < numThreads; ++i) {
+        int startRow = i * rowsPerThread;
+        int endRow = (i == numThreads - 1) ? height : (i + 1) * rowsPerThread;
+
+        threads.emplace_back(&Camera::renderSegment, this, startRow, endRow,
+                               std::ref(scene), depth);
+    }
+
+    // Wait for all threads to complete
+    for(auto& thread : threads) {
+        thread.join();
     }
 
     // Find the maximum color value
@@ -145,16 +234,14 @@ void Camera::render(const std::string& filename, const Scene& scene, int depth) 
 
     for (const auto& row : pixels) {
         for (const auto& pixel : row) {
-            // Check if max_value is greater than a small epsilon to avoid division by zero
             if (max_value > 1e-6) {
-                char r = static_cast<char>(std::min(255.0, pixel.r() ));
-                char g = static_cast<char>(std::min(255.0, pixel.g() ));
-                char b = static_cast<char>(std::min(255.0, pixel.b() ));
+                char r = static_cast<char>(std::min(255.0, pixel.r()));
+                char g = static_cast<char>(std::min(255.0, pixel.g()));
+                char b = static_cast<char>(std::min(255.0, pixel.b()));
                 out.write(&r, 1);
                 out.write(&g, 1);
                 out.write(&b, 1);
             } else {
-                // If max_value is essentially zero, write black pixels
                 char zero = 0;
                 out.write(&zero, 1);
                 out.write(&zero, 1);

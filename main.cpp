@@ -14,12 +14,14 @@ int main() {
     glm::vec3 c2 = glm::vec3(0.0f, 1.0f, -1.0f);
     glm::vec3 c3 = glm::vec3(0.0f, 1.0f, 1.0f);
     glm::vec3 c4 = glm::vec3(0.0f, -1.0f, 1.0f);
-    Camera camera(eye, c1, c2, c3, c4, 600, 600);  // Initialize the camera
+    Camera camera(eye, c1, c2, c3, c4, 300, 300);  // Initialize the camera
 
-    // Render the scene to a PPM file
+   // Render the scene to a PPM file
+    auto start = std::chrono::high_resolution_clock::now();
     camera.render("/Users/oliverlundin/Local Documents/github/raytracer/output.ppm", scene, 0);
-
-    std::cout << "Rendering complete!" << std::endl;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Rendering complete in " << elapsed.count() << " seconds!" << std::endl;
 
     return 0;
 }
