@@ -5,6 +5,7 @@
 #include "camera.h"
 #include <vector>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <thread>
@@ -26,7 +27,7 @@ Ray Camera::createRay(int x, int y) const {
 
 float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &hitPointNormal, const Scene &scene) const {
     float irradiance = 0.0f;
-    const int samples = 12;
+    const int samples = 4;
 
     for(const auto& light : scene.lights) {
         for(int i = 0; i < samples; i++) {
@@ -40,7 +41,7 @@ float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &h
             float cosTheta = glm::dot(hitPointNormal, direction);
             float cosThetaLight = glm::dot(-light.normal, direction);
 
-            // Create shadow ray with normalized direction
+              // Create shadow ray with normalized direction
             Ray shadowRay(hitPoint + hitPointNormal * 0.001f, direction);
             bool inShadow = false;
 
@@ -67,15 +68,14 @@ float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &h
 }
 
 float getRandom() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+    thread_local std::mt19937 gen(std::random_device{}());
+    std::uniform_real_distribution<float> dis(0.0f, 1.0f);
     return dis(gen);
 }
 
 colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
 
-    const int maxDepth = 4;
+    const int maxDepth = 3;
     if (depth > maxDepth) {
         return colorDBL(0.0, 0.0, 0.0);
     }
@@ -106,6 +106,10 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
 
         switch (material_type) {
 
+            default: {
+                return colorDBL(0.0, 0.0, 0.0);
+            }
+
             case Material::LIGHT: {
                 return hit_shape->getColor() * 500.0f;
             }
@@ -126,7 +130,7 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
             // Diffuse
             case Material::DIFFUSE: {
                // Generate random direction in hemisphere for diffuse reflection
-                const int numSamples = 12;  // Number of random samples for diffuse reflection
+                const int numSamples = 4;  // Number of random samples for diffuse reflection
                 colorDBL accumulated_color(0.0, 0.0, 0.0);
 
                 for(int i = 0; i < numSamples; i++) {
@@ -168,7 +172,7 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
                     colorDBL bounce_color = traceRay(*diffuse_ray, scene, depth + 1);
                     float cosTheta = glm::dot(world_direction, normal);
 
-                    // Accumulate color using BRDF and cosine term
+                    // Accumulate color using BRDF (lambertian) and cosine term
                     accumulated_color = accumulated_color +
                         (bounce_color * hit_shape->getColor() * cosTheta);
                 }
@@ -200,7 +204,8 @@ void Camera::renderSegment(int startRow, int endRow, const Scene& scene, int dep
 void Camera::render(const std::string& filename, const Scene& scene, int depth) {
     // Determine number of threads (use hardware concurrency or fall back to 4)
     unsigned int numThreads = std::thread::hardware_concurrency();
-    numThreads = numThreads > 0 ? numThreads : 4;
+    std::cout << "Number of threads: " << numThreads << std::endl;
+    //numThreads = numThreads > 0 ? numThreads : 4;
 
     // Calculate rows per thread
     int rowsPerThread = height / numThreads;

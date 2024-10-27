@@ -28,21 +28,21 @@ void Scene::addRoom() {
         {10.0f, 6.0f, -5.0f},
         {0.0f, 6.0f, -5.0f}
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices, colorDBL(0.0, 0.6, 0.0), Material(Material::DIFFUSE)));  // Green square
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices, colorDBL(0.7, 0.7, 0.7), Material(Material::DIFFUSE)));  // Green square
 
     std::vector<glm::vec3> triangleVertices_left = {
         {0.0f, -6.0f, -5.0f},
         {0.0f, 6.0f, -5.0f},
         {-3.0f, 0.0f, -5.0f}
     };
-    shapes.push_back(std::make_unique<Triangle>(triangleVertices_left, colorDBL(0.6, 0.0, 0.0),Material(Material::DIFFUSE)));  // Red triangle
+    shapes.push_back(std::make_unique<Triangle>(triangleVertices_left, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Red triangle
 
     std::vector<glm::vec3> triangleVertices_right = {
         {10.0f, -6.0f, -5.0f},
         {13.0f, 0.0f, -5.0f},
         {10.0f, 6.0f, -5.0f},
     };
-    shapes.push_back(std::make_unique<Triangle>(triangleVertices_right, colorDBL(0.6, 0.0, 0.0),Material(Material::DIFFUSE)));  // Red triangle
+    shapes.push_back(std::make_unique<Triangle>(triangleVertices_right, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Red triangle
 
     // Ceiling
     std::vector<glm::vec3> squareVertices_c = {
@@ -51,21 +51,21 @@ void Scene::addRoom() {
         {10.0f, 6.0f, 5.0f},
         {10.0f, -6.0f, 5.0f},
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices_c, colorDBL(0.0, 0.6, 0.0),Material(Material::DIFFUSE)));  // Green square
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices_c, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Green square
 
     std::vector<glm::vec3> triangleVertices_cl = {
         {0.0f, -6.0f, 5.0f},
         {-3.0f, 0.0f, 5.0f},
         {0.0f, 6.0f, 5.0f},
     };
-    shapes.push_back(std::make_unique<Triangle>(triangleVertices_cl, colorDBL(0.6, 0.0, 0.0),Material(Material::DIFFUSE)));  // Red triangle
+    shapes.push_back(std::make_unique<Triangle>(triangleVertices_cl, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Red triangle
 
     std::vector<glm::vec3> triangleVertices_cr = {
         {10.0f, 6.0f, 5.0f},
         {13.0f, 0.0f, 5.0f},
         {10.0f, -6.0f, 5.0f}
     };
-    shapes.push_back(std::make_unique<Triangle>(triangleVertices_cr, colorDBL(0.6, 0.0, 0.0),Material(Material::DIFFUSE)));  // Red triangle
+    shapes.push_back(std::make_unique<Triangle>(triangleVertices_cr, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Red triangle
 
     // Walls
     std::vector<glm::vec3> squareVertices_fl = {
@@ -75,7 +75,7 @@ void Scene::addRoom() {
         {13.0f, 0.0f, 5.0f}
 
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices_fl, colorDBL(1.0, 1.0, 1.0),Material(Material::MIRROR)));  // Mirror
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices_fl, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // Mirror
 
     std::vector<glm::vec3> squareVertices_fr = {
         {13.0f, 0.0f, 5.0f},
@@ -83,7 +83,7 @@ void Scene::addRoom() {
         {10.0f, -6.0f, -5.0f},
         {10.0f, -6.0f, 5.0f}
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices_fr, colorDBL(0.0, 0.0, 0.6),Material(Material::DIFFUSE)));  // front right
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices_fr, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // front right
 
     std::vector<glm::vec3> squareVertices_l = {
         {0.0f, 6.0f, 5.0f},
@@ -107,7 +107,7 @@ void Scene::addRoom() {
         {-3.0f, 0.0f, -5.0f},
         {0.0f, 6.0f, -5.0f}
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices_bl, colorDBL(0.0, 0.6, 0.6),Material(Material::DIFFUSE)));  //back left wall
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices_bl, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  //back left wall
 
     std::vector<glm::vec3> squareVertices_br = {
         {-3.0f, 0.0f, 5.0f},
@@ -115,18 +115,18 @@ void Scene::addRoom() {
         {0.0f, -6.0f, -5.0f},
         {-3.0f, 0.0f, -5.0f}
     };
-    shapes.push_back(std::make_unique<Rectangle>(squareVertices_br, colorDBL(0.0, 0.6, 0.6),Material(Material::DIFFUSE)));  // back right wall
+    shapes.push_back(std::make_unique<Rectangle>(squareVertices_br, colorDBL(0.7, 0.7, 0.7),Material(Material::DIFFUSE)));  // back right wall
 
     // Add objects
 
-    glm::vec3 v1(5.0f, 2.0f, -4.0f);
-    glm::vec3 v2(7.0f, 0.0f, -4.0f);
-    glm::vec3 v3(7.0f, 4.0f, -4.0f);
-    glm::vec3 v4(6.0f, 2.0f, 0.0f); // top
+    glm::vec3 v1(4.0f, 2.0f, -5.0f); // front
+    glm::vec3 v2(6.0f, 0.0f, -5.0f); // right
+    glm::vec3 v3(6.0f, 4.0f, -5.0f); // left
+    glm::vec3 v4(5.0f, 2.0f, -2.0f); // top
     addTetrahedron(v1, v2, v3, v4, colorDBL(0.7, 0.2, 0.5), Material(Material::DIFFUSE));
 
     // add sphere
-    addSphere(glm::vec3(4.0f, -3.0f, 0.0f), 1.0f, colorDBL(0.7, 0.2, 0.3), Material(Material::DIFFUSE));
+    addSphere(glm::vec3(6.0f, -2.0f, -1.0f), 2.0f, colorDBL(0.7, 0.2, 0.3), Material(Material::MIRROR));
 
     // Light
     std::vector<glm::vec3> lightVertices = {
@@ -140,7 +140,7 @@ void Scene::addRoom() {
 
     // Lights array
     lights.emplace_back(
-        glm::vec3(2.0f, 1.0f, 4.8f), glm::vec3(6.0f, 1.0f, 4.8f), glm::vec3(6.0f, -1.0f, 4.8f), glm::vec3(2.0f, -1.0f, 4.8f), colorDBL(1.0, 1.0, 1.0)
+        glm::vec3(0.0f, 1.0f, 4.8f), glm::vec3(6.0f, 1.0f, 4.8f), glm::vec3(6.0f, -1.0f, 4.8f), glm::vec3(0.0f, -1.0f, 4.8f), colorDBL(1.0, 1.0, 1.0)
     );
 
 
