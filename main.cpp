@@ -14,7 +14,7 @@ int main() {
     glm::vec3 c2 = glm::vec3(0.0f, 1.0f, -1.0f);
     glm::vec3 c3 = glm::vec3(0.0f, 1.0f, 1.0f);
     glm::vec3 c4 = glm::vec3(0.0f, -1.0f, 1.0f);
-    Camera camera(eye, c1, c2, c3, c4, 300, 300);  // Initialize the camera
+    Camera camera(eye, c1, c2, c3, c4, 800, 600);  // Initialize the camera
 
    // Render the scene to a PPM file
     auto start = std::chrono::high_resolution_clock::now();

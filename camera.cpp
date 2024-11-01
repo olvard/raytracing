@@ -27,7 +27,7 @@ Ray Camera::createRay(int x, int y) const {
 
 float Camera::calculateDirectLight(const glm::vec3 &hitPoint, const glm::vec3 &hitPointNormal, const Scene &scene) const {
     float irradiance = 0.0f;
-    const int samples = 4;
+    const int samples = 16;
 
     for(const auto& light : scene.lights) {
         for(int i = 0; i < samples; i++) {
@@ -75,7 +75,7 @@ float getRandom() {
 
 colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
 
-    const int maxDepth = 3;
+    const int maxDepth = 2;
     if (depth > maxDepth) {
         return colorDBL(0.0, 0.0, 0.0);
     }
@@ -83,6 +83,7 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
     float closest_t = std::numeric_limits<float>::max();
     const Shape* hit_shape = nullptr;
     glm::vec3 hit_point;
+    const float EPSILON = 0.0001f;
 
     //Loop through the polygons in the scene
     for (const auto& shape : scene.shapes) {
@@ -97,7 +98,7 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
         }
     }
 
-    const float EPSILON = 0.0001f;
+
 
     //return the color of the hit polygon
     if(hit_shape) {
@@ -127,10 +128,72 @@ colorDBL Camera::traceRay(Ray &ray, const Scene &scene, int depth) const {
                 return reflected_color;
             }
 
+            // Glass
+            case Material::GLASS: {
+                const float n1 = 1.0f;  // Refractive index of air
+                const float n2 = 1.5f;  // Refractive index of glass
+                float n = n1 / n2;      // Relative refractive index
+
+                glm::vec3 ray_direction = ray.getDirection();
+                float cosI = -glm::dot(normal, ray_direction);
+
+                // Check if we're exiting the material
+                if (cosI < 0) {
+                    normal = -normal;  // Flip normal if we're exiting
+                    n = 1.0f / n;     // Swap refractive indices
+                    cosI = -glm::dot(normal, ray_direction);
+                }
+
+                // Calculate reflection direction
+                glm::vec3 reflection_direction = ray_direction - 2.0f * glm::dot(ray_direction, normal) * normal;
+
+                // Calculate refraction using Snell's law
+                float cosT2 = 1.0f - n * n * (1.0f - cosI * cosI);
+
+                // Total internal reflection occurs when cosT2 < 0
+                if (cosT2 < 0.0f) {
+                    // Total internal reflection - only follow reflection ray
+                    glm::vec3 offset = hit_point + normal * EPSILON;
+                    Ray reflection_ray(offset, offset + reflection_direction, hit_shape->getColor());
+                    return traceRay(reflection_ray, scene, depth + 1);
+                }
+
+                // Calculate Fresnel terms
+                float cosT = sqrt(cosT2);
+                float Rs = ((n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT)) *
+                           ((n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT));
+                float Rp = ((n1 * cosT - n2 * cosI) / (n1 * cosT + n2 * cosI)) *
+                           ((n1 * cosT - n2 * cosI) / (n1 * cosT + n2 * cosI));
+                float Fr = (Rs + Rp) / 2.0f;  // Fresnel reflection coefficient
+
+                // Calculate refraction direction
+                glm::vec3 refraction_direction = n * ray_direction +
+                    (n * cosI - cosT) * normal;
+                refraction_direction = glm::normalize(refraction_direction);
+
+                // Create reflection and refraction rays
+                glm::vec3 offset_reflection = hit_point + normal * EPSILON;
+                glm::vec3 offset_refraction = hit_point - normal * EPSILON;
+
+                Ray reflection_ray(offset_reflection,
+                                  offset_reflection + reflection_direction,
+                                  hit_shape->getColor());
+                Ray refraction_ray(offset_refraction,
+                                  offset_refraction + refraction_direction,
+                                  hit_shape->getColor());
+
+                // Trace both rays and blend them according to Fresnel term
+                colorDBL reflection_color = traceRay(reflection_ray, scene, depth + 1);
+                colorDBL refraction_color = traceRay(refraction_ray, scene, depth + 1);
+
+                // Return the blend of reflection and refraction
+                return reflection_color * Fr + refraction_color * (1.0f - Fr);
+            }
+
             // Diffuse
             case Material::DIFFUSE: {
                // Generate random direction in hemisphere for diffuse reflection
-                const int numSamples = 4;  // Number of random samples for diffuse reflection
+                const int numSamples = 8;  // Number of random samples for diffuse reflection
                 colorDBL accumulated_color(0.0, 0.0, 0.0);
 
                 for(int i = 0; i < numSamples; i++) {

@@ -6,10 +6,10 @@
 
 void Scene::addTetrahedron(const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, const glm::vec3 &v4, const colorDBL &color, Material material) {
     // Define the four triangles of the tetrahedron
-    std::vector<glm::vec3> face1 = {v1, v2, v3};  // CCW
-    std::vector<glm::vec3> face2 = {v1, v2, v4};  // Ensure CCW
-    std::vector<glm::vec3> face3 = {v2, v3, v4};  // Ensure CCW
-    std::vector<glm::vec3> face4 = {v1, v4, v3};  // Ensure CCW
+    std::vector<glm::vec3> face1 = {v1, v2, v3}; //right
+    std::vector<glm::vec3> face2 = {v1, v4, v2}; //bottom
+    std::vector<glm::vec3> face3 = {v2, v4, v3}; //back
+    std::vector<glm::vec3> face4 = {v1, v3, v4}; //left
 
     // Add each triangle to the scene as a unique_ptr<Triangle>
     shapes.push_back(std::make_unique<Triangle>(face1, color, material));
@@ -119,14 +119,18 @@ void Scene::addRoom() {
 
     // Add objects
 
-    glm::vec3 v1(4.0f, 2.0f, -5.0f); // front
-    glm::vec3 v2(6.0f, 0.0f, -5.0f); // right
-    glm::vec3 v3(6.0f, 4.0f, -5.0f); // left
-    glm::vec3 v4(5.0f, 2.0f, -2.0f); // top
+    glm::vec3 v1(4.0f, 2.0f, -4.0f); // front
+    glm::vec3 v2(6.0f, 0.0f, -4.0f); // right
+    glm::vec3 v3(4.5f, 2.0f, -1.0f); // top
+    glm::vec3 v4(7.0f, 4.0f, -4.0f); // left
+
+
     addTetrahedron(v1, v2, v3, v4, colorDBL(0.7, 0.2, 0.5), Material(Material::DIFFUSE));
 
     // add sphere
     addSphere(glm::vec3(6.0f, -2.0f, -1.0f), 2.0f, colorDBL(0.7, 0.2, 0.3), Material(Material::MIRROR));
+
+    addSphere(glm::vec3(2.0f, 1.0f, 1.0f), 1.0f, colorDBL(0.7, 0.2, 0.3), Material(Material::GLASS));
 
     // Light
     std::vector<glm::vec3> lightVertices = {
